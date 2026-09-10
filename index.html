@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Сюрприз для тебя ❤️</title>
 
-  <!-- Подключение красивого минималистичного шрифта Inter -->
+  <!-- Минималистичный шрифт Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
       position: relative;
     }
 
-    /* 1. Контейнер для всплывающих фотографий */
+    /* 1. Контейнер для фотографий */
     .photo-gallery {
       position: absolute;
       top: 0;
@@ -72,70 +72,80 @@
 
     /* Контейнер для основного содержимого */
     .container {
-      max-width: 600px;
+      max-width: 620px;
       width: 88%;
-      padding: 20px;
+      padding: 30px 20px;
       text-align: center;
       z-index: 2;
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 250px;
+      justify-content: center;
     }
 
-    /* 2. Текстовые абзацы с плавным появлением */
+    /* 2. Текстовые блоки с выплывающей анимацией */
     .text-block {
+      display: none;
       opacity: 0;
-      transform: translateY(15px);
-      transition: opacity 1s ease, transform 1s ease;
-      font-size: 1.15rem;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      font-size: 1.2rem;
       line-height: 1.8;
       color: #2b2b2b;
       font-weight: 300;
       letter-spacing: -0.01em;
-      margin-bottom: 20px;
-      display: none;
       text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
     }
 
     .text-block.visible {
       display: block;
+    }
+
+    .text-block.animate-in {
       opacity: 1;
       transform: translateY(0);
     }
 
-    /* Стрелочка для продолжения */
-    .next-arrow {
+    /* Элементы навигации (стрелочки) */
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 25px;
+      margin-top: 25px;
+      min-height: 50px;
+    }
+
+    .nav-arrow {
       opacity: 0;
       transform: translateY(10px);
-      transition: all 0.6s ease;
+      transition: all 0.5s ease;
       cursor: pointer;
-      margin-top: 10px;
-      padding: 10px;
+      padding: 8px;
       display: none;
+      user-select: none;
     }
 
-    .next-arrow.visible {
-      display: inline-block;
+    .nav-arrow.visible {
+      display: inline-flex;
       opacity: 1;
       transform: translateY(0);
-      animation: bounce 2s infinite;
     }
 
-    .next-arrow svg {
-      width: 28px;
-      height: 28px;
+    .nav-arrow svg {
+      width: 32px;
+      height: 32px;
       fill: #e63946;
+      transition: transform 0.2s ease;
     }
 
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-8px); }
-      60% { transform: translateY(-4px); }
+    .nav-arrow:hover svg {
+      transform: scale(1.15);
     }
 
     /* 3. Кнопка «Смотреть» */
     .watch-btn {
-      margin-top: 25px;
       padding: 14px 38px;
       font-size: 1.05rem;
       font-weight: 500;
@@ -178,6 +188,7 @@
       flex-direction: column;
       opacity: 0;
       transition: opacity 0.5s ease;
+      cursor: pointer; /* Указывает, что на фон можно нажать */
     }
 
     .video-modal.active {
@@ -192,6 +203,7 @@
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      cursor: default; /* Клики по самому видео не закрывают его */
     }
 
     video {
@@ -205,10 +217,10 @@
 
   <!-- Контейнер для фотографий -->
   <div class="photo-gallery" id="gallery">
-    <div class="polaroid" style="top: 12%; left: 8%; --rot: -10deg;"><img src="photo1.jpg" alt="Photo 1"></div>
-    <div class="polaroid" style="top: 15%; right: 8%; --rot: 12deg;"><img src="photo2.jpg" alt="Photo 2"></div>
-    <!-- Смещена ниже (top: 50%), чтобы не перекрывать полностью первые две -->
-    <div class="polaroid" style="top: 50%; left: 50%; transform: translate(-50%, -50%); --rot: -3deg;"><img src="photo3.jpg" alt="Photo 3"></div>
+    <div class="polaroid" style="top: 10%; left: 8%; --rot: -10deg;"><img src="photo1.jpg" alt="Photo 1"></div>
+    <div class="polaroid" style="top: 12%; right: 8%; --rot: 12deg;"><img src="photo2.jpg" alt="Photo 2"></div>
+    <!-- Третья фото опущена ещё ниже (top: 62%) и под углом (--rot: 8deg) -->
+    <div class="polaroid" style="top: 62%; left: 50%; transform: translate(-50%, -50%); --rot: 8deg;"><img src="photo3.jpg" alt="Photo 3"></div>
   </div>
 
   <!-- Главное содержимое -->
@@ -225,19 +237,27 @@
       Я не мастер говорить о своих чувствах, но возможно у меня неплохо получается их показывать)
     </div>
 
-    <!-- Кликучая стрелочка -->
-    <div class="next-arrow" id="nextArrow">
-      <svg viewBox="0 0 24 24">
-        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-      </svg>
-    </div>
+    <!-- Стрелочки навигации -->
+    <div class="nav-container">
+      <div class="nav-arrow" id="prevBtn">
+        <svg viewBox="0 0 24 24">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
+      </div>
 
-    <button class="watch-btn" id="watchBtn">Смотреть ❤️</button>
+      <div class="nav-arrow" id="nextBtn">
+        <svg viewBox="0 0 24 24">
+          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+        </svg>
+      </div>
+
+      <button class="watch-btn" id="watchBtn">Смотреть ❤️</button>
+    </div>
   </div>
 
   <!-- Модальное окно с видео -->
   <div class="video-modal" id="videoModal">
-    <div class="video-container">
+    <div class="video-container" id="videoContainer">
       <video id="myVideo" controls>
         <source src="video.mp4" type="video/mp4">
         Ваш браузер не поддерживает видео.
@@ -247,17 +267,21 @@
 
   <script>
     const polaroids = document.querySelectorAll('.polaroid');
-    const block1 = document.getElementById('block1');
-    const block2 = document.getElementById('block2');
-    const block3 = document.getElementById('block3');
-    const nextArrow = document.getElementById('nextArrow');
+    const blocks = [
+      document.getElementById('block1'),
+      document.getElementById('block2'),
+      document.getElementById('block3')
+    ];
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
     const watchBtn = document.getElementById('watchBtn');
     const videoModal = document.getElementById('videoModal');
+    const videoContainer = document.getElementById('videoContainer');
     const video = document.getElementById('myVideo');
 
-    let currentStep = 1;
+    let currentStep = 0;
 
-    // 1. Анимация появления и скрытия фото
+    // 1. Анимация фото
     function showPhotos() {
       polaroids.forEach((photo, index) => {
         setTimeout(() => {
@@ -268,38 +292,66 @@
       // Скрываем фото через 4.5 секунды
       setTimeout(() => {
         polaroids.forEach(photo => photo.classList.add('fade-out'));
-        // Показываем первый абзац текста
-        setTimeout(showFirstParagraph, 800);
+        setTimeout(updateStep, 800);
       }, 4500);
     }
 
-    // 2. Показ первого абзаца и стрелочки
-    function showFirstParagraph() {
-      block1.classList.add('visible');
-      setTimeout(() => {
-        nextArrow.classList.add('visible');
-      }, 600);
+    // 2. Обновление состояния текста и кнопок
+    function updateStep() {
+      blocks.forEach((block, index) => {
+        if (index === currentStep) {
+          block.classList.add('visible');
+          setTimeout(() => block.classList.add('animate-in'), 50);
+        } else {
+          block.classList.remove('animate-in');
+          block.classList.remove('visible');
+        }
+      });
+
+      // Логика стрелок
+      if (currentStep === 0) {
+        prevBtn.classList.remove('visible');
+        nextBtn.classList.add('visible');
+        watchBtn.classList.remove('visible');
+      } else if (currentStep === 1) {
+        prevBtn.classList.add('visible');
+        nextBtn.classList.add('visible');
+        watchBtn.classList.remove('visible');
+      } else if (currentStep === 2) {
+        prevBtn.classList.add('visible');
+        nextBtn.classList.remove('visible');
+        watchBtn.classList.add('visible');
+      }
     }
 
-    // 3. Обработка клика по стрелочке
-    nextArrow.addEventListener('click', () => {
-      if (currentStep === 1) {
-        block2.classList.add('visible');
-        currentStep = 2;
-      } else if (currentStep === 2) {
-        block3.classList.add('visible');
-        nextArrow.classList.remove('visible'); // Скрываем стрелочку
-        setTimeout(() => {
-          watchBtn.classList.add('visible'); // Показываем кнопку «Смотреть»
-        }, 600);
-        currentStep = 3;
+    // События кнопок переключения
+    nextBtn.addEventListener('click', () => {
+      if (currentStep < blocks.length - 1) {
+        currentStep++;
+        updateStep();
       }
     });
 
-    // 4. Нажатие на кнопку и вывод видео
+    prevBtn.addEventListener('click', () => {
+      if (currentStep > 0) {
+        currentStep--;
+        updateStep();
+      }
+    });
+
+    // 3. Открытие видео
     watchBtn.addEventListener('click', () => {
       videoModal.classList.add('active');
       video.play();
+    });
+
+    // 4. Закрытие видео при клике вне его области (на темный фон)
+    videoModal.addEventListener('click', (e) => {
+      // Проверяем, что клик был не по самой плашке с видео
+      if (!videoContainer.contains(e.target)) {
+        videoModal.classList.remove('active');
+        video.pause();
+      }
     });
 
     // Запуск процесса при загрузке страницы
