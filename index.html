@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сюрприз для тебя ❤️</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: url('bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 1. Контейнер для всплывающих фотографий */
+    .photo-gallery {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .polaroid {
+      position: absolute;
+      width: 180px;
+      padding: 10px 10px 25px 10px;
+      background: white;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      border-radius: 4px;
+      opacity: 0;
+      transform: scale(0.5) rotate(0deg);
+      transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .polaroid img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+
+    .polaroid.show {
+      opacity: 1;
+      transform: scale(1) rotate(var(--rot));
+    }
+
+    .polaroid.fade-out {
+      opacity: 0;
+      transform: scale(1.1) translateY(-20px);
+      transition: all 1s ease;
+    }
+
+    /* Контейнер для основного содержимого */
+    .container {
+      max-width: 650px;
+      width: 90%;
+      padding: 30px;
+      text-align: center;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 2. Текст с эффектом печатной машинки */
+    .typewriter-text {
+      font-size: 1.25rem;
+      line-height: 1.7;
+      color: #222;
+      white-space: pre-wrap; /* Сохраняет переносы строк */
+      min-height: 150px;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+    }
+
+    /* Каретка (мигающий курсор) */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.2em;
+      background-color: #e63946;
+      vertical-align: bottom;
+      animation: blink 0.7s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* 3. Кнопка «Смотреть» */
+    .watch-btn {
+      margin-top: 30px;
+      padding: 14px 36px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #ff4b2b, #ff416c);
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+      pointer-events: none;
+    }
+
+    .watch-btn.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .watch-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 65, 108, 0.6);
+    }
+
+    /* 4. Окно с видео */
+    .video-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .video-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .video-container {
+      width: 90%;
+      max-width: 720px;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Контейнер для фотографий -->
+  <div class="photo-gallery" id="gallery">
+    <div class="polaroid" style="top: 15%; left: 10%; --rot: -12deg;"><img src="photo1.jpg" alt="Photo 1"></div>
+    <div class="polaroid" style="top: 35%; right: 12%; --rot: 15deg;"><img src="photo2.jpg" alt="Photo 2"></div>
+    <div class="polaroid" style="top: 25%; left: 35%; --rot: -5deg;"><img src="photo3.jpg" alt="Photo 3"></div>
+  </div>
+
+  <!-- Главное содержимое -->
+  <div class="container">
+    <div class="typewriter-text"><span id="text"></span><span class="cursor" id="cursor"></span></div>
+    <button class="watch-btn" id="watchBtn">Смотреть ❤️</button>
+  </div>
+
+  <!-- Модальное окно с видео -->
+  <div class="video-modal" id="videoModal">
+    <div class="video-container">
+      <video id="myVideo" controls>
+        <source src="video.mp4" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+      </video>
+    </div>
+  </div>
+
+  <script>
+    // === ВАШ ТЕКСТ ДЛЯ ПЕЧАТИ ===
+    const textToType = "Я буду писать это от чистого сердца под песню «on my own», под которую мы ехали 3 июля вслед за салютом.\n\nТолько в тот момент самым громким в радиусе нескольких метров был не он, а моё сердце, которое вырывалось из моей груди.\n\nЯ не мастер говорить о своих чувствах, но возможно у меня неплохо получается их показывать)";
+
+    const polaroids = document.querySelectorAll('.polaroid');
+    const textElement = document.getElementById('text');
+    const cursorElement = document.getElementById('cursor');
+    const watchBtn = document.getElementById('watchBtn');
+    const videoModal = document.getElementById('videoModal');
+    const video = document.getElementById('myVideo');
+
+    // 1. Анимация фото
+    function showPhotos() {
+      polaroids.forEach((photo, index) => {
+        setTimeout(() => {
+          photo.classList.add('show');
+        }, index * 600); // Фотографии появляются по очереди
+      });
+
+      // Скрываем фото через 4.5 секунды
+      setTimeout(() => {
+        polaroids.forEach(photo => photo.classList.add('fade-out'));
+        // Запускаем печать текста после исчезновения фото
+        setTimeout(startTyping, 800);
+      }, 4500);
+    }
+
+    // 2. Эффект печатной машинки
+    let index = 0;
+    function startTyping() {
+      if (index < textToType.length) {
+        textElement.textContent += textToType.charAt(index);
+        index++;
+        setTimeout(startTyping, 50); // Скорость печати (50 мс на символ)
+      } else {
+        cursorElement.style.display = 'none'; // Убираем мигающий курсор
+        showButton(); // Показываем кнопку «Смотреть»
+      }
+    }
+
+    // 3. Появление кнопки «Смотреть»
+    function showButton() {
+      watchBtn.classList.add('visible');
+    }
+
+    // 4. Нажатие на кнопку и вывод видео
+    watchBtn.addEventListener('click', () => {
+      videoModal.classList.add('active');
+      video.play(); // Автоматический запуск видео
+    });
+
+    // Запуск процесса при загрузке страницы
+    window.addEventListener('DOMContentLoaded', showPhotos);
+  </script>
+</body>
+</html>
