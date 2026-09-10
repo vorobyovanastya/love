@@ -42,7 +42,7 @@
 
     .polaroid {
       position: absolute;
-      width: 180px;
+      width: 170px;
       padding: 10px 10px 25px 10px;
       background: white;
       box-shadow: 0 10px 25px rgba(0,0,0,0.15);
@@ -54,7 +54,7 @@
 
     .polaroid img {
       width: 100%;
-      height: 180px;
+      height: 170px;
       object-fit: cover;
       border-radius: 2px;
     }
@@ -68,6 +68,25 @@
       opacity: 0;
       transform: scale(1.05) translateY(-15px);
       transition: all 1s ease;
+    }
+
+    /* Расположение фото по предоставленному референсу (каскад по диагонали) */
+    .photo-1 {
+      top: 8%;
+      right: 15%;
+      --rot: 12deg;
+    }
+
+    .photo-2 {
+      top: 36%;
+      left: 12%;
+      --rot: -12deg;
+    }
+
+    .photo-3 {
+      top: 64%;
+      right: 20%;
+      --rot: 10deg;
     }
 
     /* Контейнер для основного содержимого */
@@ -188,7 +207,7 @@
       flex-direction: column;
       opacity: 0;
       transition: opacity 0.5s ease;
-      cursor: pointer; /* Указывает, что на фон можно нажать */
+      cursor: pointer;
     }
 
     .video-modal.active {
@@ -203,7 +222,7 @@
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-      cursor: default; /* Клики по самому видео не закрывают его */
+      cursor: default;
     }
 
     video {
@@ -215,12 +234,11 @@
 </head>
 <body>
 
-  <!-- Контейнер для фотографий -->
+  <!-- Контейнер для фотографий в виде каскада по диагонали -->
   <div class="photo-gallery" id="gallery">
-    <div class="polaroid" style="top: 10%; left: 8%; --rot: -10deg;"><img src="photo1.jpg" alt="Photo 1"></div>
-    <div class="polaroid" style="top: 12%; right: 8%; --rot: 12deg;"><img src="photo2.jpg" alt="Photo 2"></div>
-    <!-- Третья фото опущена ещё ниже (top: 62%) и под углом (--rot: 8deg) -->
-    <div class="polaroid" style="top: 62%; left: 50%; transform: translate(-50%, -50%); --rot: 8deg;"><img src="photo3.jpg" alt="Photo 3"></div>
+    <div class="polaroid photo-1"><img src="photo1.jpg" alt="Photo 1"></div>
+    <div class="polaroid photo-2"><img src="photo2.jpg" alt="Photo 2"></div>
+    <div class="polaroid photo-3"><img src="photo3.jpg" alt="Photo 3"></div>
   </div>
 
   <!-- Главное содержимое -->
@@ -237,7 +255,7 @@
       Я не мастер говорить о своих чувствах, но возможно у меня неплохо получается их показывать)
     </div>
 
-    <!-- Стрелочки навигации -->
+    <!-- Навигация -->
     <div class="nav-container">
       <div class="nav-arrow" id="prevBtn">
         <svg viewBox="0 0 24 24">
@@ -281,7 +299,7 @@
 
     let currentStep = 0;
 
-    // 1. Анимация фото
+    // 1. Анимация появления и скрытия фото
     function showPhotos() {
       polaroids.forEach((photo, index) => {
         setTimeout(() => {
@@ -289,7 +307,6 @@
         }, index * 600);
       });
 
-      // Скрываем фото через 4.5 секунды
       setTimeout(() => {
         polaroids.forEach(photo => photo.classList.add('fade-out'));
         setTimeout(updateStep, 800);
@@ -318,7 +335,8 @@
         nextBtn.classList.add('visible');
         watchBtn.classList.remove('visible');
       } else if (currentStep === 2) {
-        prevBtn.classList.add('visible');
+        // На третьем (последнем) абзаце скрываем обе стрелочки и оставляем только кнопку
+        prevBtn.classList.remove('visible');
         nextBtn.classList.remove('visible');
         watchBtn.classList.add('visible');
       }
@@ -345,9 +363,8 @@
       video.play();
     });
 
-    // 4. Закрытие видео при клике вне его области (на темный фон)
+    // 4. Закрытие видео при клике вне его области
     videoModal.addEventListener('click', (e) => {
-      // Проверяем, что клик был не по самой плашке с видео
       if (!videoContainer.contains(e.target)) {
         videoModal.classList.remove('active');
         video.pause();
