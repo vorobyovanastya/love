@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Сюрприз для тебя ❤️</title>
+
+  <!-- Подключение красивого минималистичного шрифта Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
   <style>
     * {
       box-sizing: border-box;
@@ -12,7 +18,7 @@
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -39,7 +45,7 @@
       width: 180px;
       padding: 10px 10px 25px 10px;
       background: white;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
       border-radius: 4px;
       opacity: 0;
       transform: scale(0.5) rotate(0deg);
@@ -60,15 +66,15 @@
 
     .polaroid.fade-out {
       opacity: 0;
-      transform: scale(1.1) translateY(-20px);
+      transform: scale(1.05) translateY(-15px);
       transition: all 1s ease;
     }
 
     /* Контейнер для основного содержимого */
     .container {
-      max-width: 650px;
-      width: 90%;
-      padding: 30px;
+      max-width: 600px;
+      width: 88%;
+      padding: 20px;
       text-align: center;
       z-index: 2;
       display: flex;
@@ -76,59 +82,85 @@
       align-items: center;
     }
 
-    /* 2. Текст с эффектом печатной машинки */
-    .typewriter-text {
-      font-size: 1.25rem;
-      line-height: 1.7;
-      color: #222;
-      white-space: pre-wrap; /* Сохраняет переносы строк */
-      min-height: 150px;
+    /* 2. Текстовые абзацы с плавным появлением */
+    .text-block {
+      opacity: 0;
+      transform: translateY(15px);
+      transition: opacity 1s ease, transform 1s ease;
+      font-size: 1.15rem;
+      line-height: 1.8;
+      color: #2b2b2b;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      margin-bottom: 20px;
+      display: none;
       text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
-      font-weight: 500;
     }
 
-    /* Каретка (мигающий курсор) */
-    .cursor {
+    .text-block.visible {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Стрелочка для продолжения */
+    .next-arrow {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.6s ease;
+      cursor: pointer;
+      margin-top: 10px;
+      padding: 10px;
+      display: none;
+    }
+
+    .next-arrow.visible {
       display: inline-block;
-      width: 2px;
-      height: 1.2em;
-      background-color: #e63946;
-      vertical-align: bottom;
-      animation: blink 0.7s infinite;
+      opacity: 1;
+      transform: translateY(0);
+      animation: bounce 2s infinite;
     }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
+    .next-arrow svg {
+      width: 28px;
+      height: 28px;
+      fill: #e63946;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-8px); }
+      60% { transform: translateY(-4px); }
     }
 
     /* 3. Кнопка «Смотреть» */
     .watch-btn {
-      margin-top: 30px;
-      padding: 14px 36px;
-      font-size: 1.15rem;
-      font-weight: 600;
+      margin-top: 25px;
+      padding: 14px 38px;
+      font-size: 1.05rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
       color: white;
       background: linear-gradient(135deg, #ff4b2b, #ff416c);
       border: none;
-      border-radius: 25px;
+      border-radius: 30px;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+      box-shadow: 0 4px 15px rgba(255, 65, 108, 0.35);
       opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.5s ease;
-      pointer-events: none;
+      transform: translateY(15px);
+      transition: all 0.6s ease;
+      display: none;
     }
 
     .watch-btn.visible {
+      display: inline-block;
       opacity: 1;
       transform: translateY(0);
-      pointer-events: auto;
     }
 
     .watch-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 65, 108, 0.6);
+      box-shadow: 0 6px 20px rgba(255, 65, 108, 0.5);
     }
 
     /* 4. Окно с видео */
@@ -173,14 +205,33 @@
 
   <!-- Контейнер для фотографий -->
   <div class="photo-gallery" id="gallery">
-    <div class="polaroid" style="top: 15%; left: 10%; --rot: -12deg;"><img src="photo1.jpg" alt="Photo 1"></div>
-    <div class="polaroid" style="top: 35%; right: 12%; --rot: 15deg;"><img src="photo2.jpg" alt="Photo 2"></div>
-    <div class="polaroid" style="top: 25%; left: 35%; --rot: -5deg;"><img src="photo3.jpg" alt="Photo 3"></div>
+    <div class="polaroid" style="top: 12%; left: 8%; --rot: -10deg;"><img src="photo1.jpg" alt="Photo 1"></div>
+    <div class="polaroid" style="top: 15%; right: 8%; --rot: 12deg;"><img src="photo2.jpg" alt="Photo 2"></div>
+    <!-- Смещена ниже (top: 50%), чтобы не перекрывать полностью первые две -->
+    <div class="polaroid" style="top: 50%; left: 50%; transform: translate(-50%, -50%); --rot: -3deg;"><img src="photo3.jpg" alt="Photo 3"></div>
   </div>
 
   <!-- Главное содержимое -->
   <div class="container">
-    <div class="typewriter-text"><span id="text"></span><span class="cursor" id="cursor"></span></div>
+    <div class="text-block" id="block1">
+      Я буду писать это от чистого сердца под песню «on my own», под которую мы ехали 3 июля вслед за салютом.
+    </div>
+    
+    <div class="text-block" id="block2">
+      Только в тот момент самым громким в радиусе нескольких метров был не он, а моё сердце, которое вырывалось из моей груди.
+    </div>
+    
+    <div class="text-block" id="block3">
+      Я не мастер говорить о своих чувствах, но возможно у меня неплохо получается их показывать)
+    </div>
+
+    <!-- Кликучая стрелочка -->
+    <div class="next-arrow" id="nextArrow">
+      <svg viewBox="0 0 24 24">
+        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+      </svg>
+    </div>
+
     <button class="watch-btn" id="watchBtn">Смотреть ❤️</button>
   </div>
 
@@ -195,54 +246,60 @@
   </div>
 
   <script>
-    // === ВАШ ТЕКСТ ДЛЯ ПЕЧАТИ ===
-    const textToType = "Я буду писать это от чистого сердца под песню «on my own», под которую мы ехали 3 июля вслед за салютом.\n\nТолько в тот момент самым громким в радиусе нескольких метров был не он, а моё сердце, которое вырывалось из моей груди.\n\nЯ не мастер говорить о своих чувствах, но возможно у меня неплохо получается их показывать)";
-
     const polaroids = document.querySelectorAll('.polaroid');
-    const textElement = document.getElementById('text');
-    const cursorElement = document.getElementById('cursor');
+    const block1 = document.getElementById('block1');
+    const block2 = document.getElementById('block2');
+    const block3 = document.getElementById('block3');
+    const nextArrow = document.getElementById('nextArrow');
     const watchBtn = document.getElementById('watchBtn');
     const videoModal = document.getElementById('videoModal');
     const video = document.getElementById('myVideo');
 
-    // 1. Анимация фото
+    let currentStep = 1;
+
+    // 1. Анимация появления и скрытия фото
     function showPhotos() {
       polaroids.forEach((photo, index) => {
         setTimeout(() => {
           photo.classList.add('show');
-        }, index * 600); // Фотографии появляются по очереди
+        }, index * 600);
       });
 
       // Скрываем фото через 4.5 секунды
       setTimeout(() => {
         polaroids.forEach(photo => photo.classList.add('fade-out'));
-        // Запускаем печать текста после исчезновения фото
-        setTimeout(startTyping, 800);
+        // Показываем первый абзац текста
+        setTimeout(showFirstParagraph, 800);
       }, 4500);
     }
 
-    // 2. Эффект печатной машинки
-    let index = 0;
-    function startTyping() {
-      if (index < textToType.length) {
-        textElement.textContent += textToType.charAt(index);
-        index++;
-        setTimeout(startTyping, 50); // Скорость печати (50 мс на символ)
-      } else {
-        cursorElement.style.display = 'none'; // Убираем мигающий курсор
-        showButton(); // Показываем кнопку «Смотреть»
-      }
+    // 2. Показ первого абзаца и стрелочки
+    function showFirstParagraph() {
+      block1.classList.add('visible');
+      setTimeout(() => {
+        nextArrow.classList.add('visible');
+      }, 600);
     }
 
-    // 3. Появление кнопки «Смотреть»
-    function showButton() {
-      watchBtn.classList.add('visible');
-    }
+    // 3. Обработка клика по стрелочке
+    nextArrow.addEventListener('click', () => {
+      if (currentStep === 1) {
+        block2.classList.add('visible');
+        currentStep = 2;
+      } else if (currentStep === 2) {
+        block3.classList.add('visible');
+        nextArrow.classList.remove('visible'); // Скрываем стрелочку
+        setTimeout(() => {
+          watchBtn.classList.add('visible'); // Показываем кнопку «Смотреть»
+        }, 600);
+        currentStep = 3;
+      }
+    });
 
     // 4. Нажатие на кнопку и вывод видео
     watchBtn.addEventListener('click', () => {
       videoModal.classList.add('active');
-      video.play(); // Автоматический запуск видео
+      video.play();
     });
 
     // Запуск процесса при загрузке страницы
